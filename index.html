@@ -1,0 +1,317 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>LOOP — Instituto Aster</title><style>
+:root{--u:1}
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#050707;color:#cfe8e0;font:calc(14px*var(--u))/1.45 ui-monospace,Consolas,monospace;overflow:hidden;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+button{font:inherit;color:#bfe;background:#0d1a1a;border:1px solid #2f5a55;padding:.6em 1em;border-radius:3px}
+button:active{background:#1d3b38}button:disabled{opacity:.35}
+#hud{position:fixed;top:0;left:0;right:0;padding:8px 10px;display:none;pointer-events:none;text-shadow:0 0 6px #000;z-index:3}
+#hud small{opacity:.7}#ht{text-align:center;font-size:2em;letter-spacing:.1em;color:#9fd}#ht.lo{color:#f55}
+#hb{position:absolute;top:8px;right:8px;display:flex;gap:6px;pointer-events:auto}#hb button{padding:.4em .7em}
+#ho{text-align:center;color:#8c9}
+#tt{position:fixed;left:10px;top:34%;color:#7fe;z-index:3;pointer-events:none;text-shadow:0 0 6px #000}
+#cap{position:fixed;top:24%;left:0;right:0;text-align:center;color:#7fe;font-size:1.1em;opacity:0;transition:opacity .6s;pointer-events:none;padding:0 14px;text-shadow:0 0 8px #0f8;z-index:3}
+#pr{position:fixed;bottom:24%;left:50%;transform:translateX(-50%);background:#0b1514e0;border:1px solid #3a7;padding:.5em 1em;display:none;border-radius:3px;white-space:nowrap;z-index:4}
+#dlg{position:fixed;left:3%;right:3%;bottom:4%;background:#07100ff2;border:1px solid #3a7;padding:14px;display:none;min-height:5.5em;z-index:6}
+#dlg b{display:block;color:#7fe;margin-bottom:4px}#dlg i{float:right;opacity:.5}
+#scr{position:fixed;inset:0;display:none;background:#030606ee;z-index:8;overflow:auto;padding:18px;text-align:center;touch-action:pan-y}
+#scr h1{letter-spacing:.2em;color:#9fd;margin:.4em 0}.m button{display:block;width:min(280px,80%);margin:8px auto}
+#scr .it{border:1px solid #234;margin:6px auto;max-width:520px;padding:8px;text-align:left}#scr .it small{color:#8a9}.un{opacity:.4}
+#fade{position:fixed;inset:0;background:#000;color:#9fd;display:flex;align-items:center;justify-content:center;font-size:2.2em;letter-spacing:.3em;opacity:0;pointer-events:none;transition:opacity .7s;z-index:9}
+#rev{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;text-align:center;color:#f43;font-size:1.3em;padding:20px}
+#rev em{font-style:normal;font-size:1.5em;display:block;margin:20px 0;min-height:3em}
+.gl{animation:g .15s infinite}
+@keyframes g{0%{transform:translate(2px,0);text-shadow:3px 0 #0ff,-3px 0 #f0f}50%{transform:translate(-3px,1px)}100%{transform:none}}
+#touch{display:none;position:fixed;inset:auto 0 0 0;height:40%;z-index:4;pointer-events:none}
+#joy{position:absolute;left:4%;bottom:6%;width:130px;height:130px;border-radius:50%;border:2px solid #3a766a;background:#0b1a1766;pointer-events:auto;touch-action:none}
+#kn{position:absolute;left:40px;top:40px;width:50px;height:50px;border-radius:50%;background:#4fb;opacity:.5}
+#bE{position:absolute;right:6%;bottom:9%;width:84px;height:84px;border-radius:50%;pointer-events:auto;font-size:1.4em}
+label{display:block;margin:12px auto;max-width:320px;text-align:left}input[type=range]{width:100%}
+#scr.mn{background:radial-gradient(ellipse at 50% 25%,#0e2b2aee,#040909f5 65%,#020404);backdrop-filter:blur(2px);display:flex}
+#scr.mn::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,#0000 0 2px,#0006 2px 3px);pointer-events:none}
+.mw{width:min(380px,92%);margin:auto;text-align:left;position:relative}
+.tg{font-size:.75em;letter-spacing:.35em;color:#3fb;opacity:.8;animation:bl 2s steps(2) infinite}
+@keyframes bl{50%{opacity:.25}}
+#scr .lt{position:relative;font-size:5.5em;line-height:1;letter-spacing:.12em;margin:.1em 0 0;color:#dffff6;text-shadow:0 0 24px #1fb8}
+.lt::before,.lt::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden;opacity:0}
+.lt::before{color:#0ff;clip-path:inset(0 0 55% 0);animation:gc 3.2s infinite steps(1)}
+.lt::after{color:#f0a;clip-path:inset(55% 0 0 0);animation:gc 2.7s infinite steps(1) reverse}
+@keyframes gc{0%,88%{opacity:0}90%{opacity:.8;transform:translate(-4px,0)}94%{opacity:.8;transform:translate(4px,1px)}100%{opacity:0}}
+.sb{letter-spacing:.5em;color:#7ab;font-size:.95em;margin-bottom:14px;border-bottom:1px solid #234a46;padding-bottom:10px}
+.sv{font-size:.8em;color:#8c9;margin:0 0 12px;opacity:.85}
+.mb button{display:flex;align-items:center;gap:12px;width:100%;margin:7px 0;background:linear-gradient(90deg,#0d1f1f,#0a1414);border:1px solid #234a46;border-left:3px solid #3fb;padding:.8em 1em;text-align:left;letter-spacing:.12em;text-transform:uppercase;transition:transform .15s,border-color .15s,background .15s}
+.mb button:hover:not(:disabled),.mb button:active:not(:disabled){transform:translateX(6px);border-color:#4fd;background:linear-gradient(90deg,#14403a,#0c2220)}
+.mb button.pri{background:linear-gradient(90deg,#14403a,#0c2220);border-color:#4fd;color:#eafff8}
+.mb button span{color:#3fb;opacity:.6;font-size:.8em}
+.ft{margin-top:18px;font-size:.65em;letter-spacing:.25em;opacity:.45}
+#cf{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:12;padding:16px}
+#cf div{background:#07100f;border:1px solid #3a7;padding:20px;max-width:340px;text-align:center}#cf button{margin:6px}
+@media(prefers-reduced-motion:reduce){.lt::before,.lt::after,.tg{animation:none}}
+#fc{display:none;width:min(92vw,640px);aspect-ratio:16/9;image-rendering:pixelated;border:2px solid #234a46;background:#000;margin:10px 0}
+#rev em{font-size:1.1em;min-height:4.5em}
+#dlg u{cursor:pointer;margin-left:8px}.sl{display:flex;gap:6px;margin:0 0 10px}.sl button{flex:1;padding:.35em;font-size:.75em}.sl .on{border-color:#4fd;color:#fff}.kb{margin:3px;padding:.4em .6em}
+.fb{margin:3px;padding:.4em .8em}.fb.sel{border-color:#4fd;color:#fff;background:#14403a}#fp{position:fixed;left:50%;top:2px;transform:translateX(-50%);font-size:11px;color:#9f9;z-index:20;pointer-events:none}
+#rev #fc{position:static;inset:auto;height:auto;width:min(92vw,640px,calc((100vh - 190px)*1.78))}#rev{overflow-y:auto}@media(max-height:520px){#rev em{font-size:.9em;min-height:3.4em;margin:6px 0}}
+</style></head><body>
+<canvas id="cv"></canvas>
+<div id="hud"><div id="hl"></div><div id="ht"></div><div id="ho"></div><div id="hb"><button id="bh">?</button><button id="bm">MAPA</button><button id="bp">II</button></div></div>
+<div id="tt"></div><div id="cap"></div><div id="pr"></div><div id="dlg"></div>
+<div id="touch"><div id="joy"><div id="kn"></div></div><button id="bE">E</button></div>
+<div id="scr"></div><div id="fp"></div><div id="fade"></div>
+<div id="rev"><div id="r1"></div><canvas id="fc" width="160" height="90"></canvas><em id="r2" class="gl"></em><button id="rb" style="display:none">CONTINUAR</button></div>
+<script>
+'use strict';
+/* ===== DADOS ===== */
+const T=32,MW=56,MH=50,$=i=>document.getElementById(i),cv=$('cv'),cx=cv.getContext('2d'),lc=document.createElement('canvas'),lx=lc.getContext('2d');
+let S=null,CFG={vol:.6,fx:1,ui:1,calm:0,fps:60,fc:0,cyc:60,soft:0,slot:1,keys:{u:'w',d:'s',l:'a',r:'d',e:'e'}},W=1,H=1,Z=2,vg=null,vr=null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),bind=(i,f)=>{const e=$(i);if(e)e.onclick=f};
+try{Object.assign(CFG,JSON.parse(localStorage.getItem('loop_aster_cfg')))}catch(e){}
+const ROOMS=[['rec','Recepção',2,14,10,8,0,'#2c3a38'],['cor','Corredor central',12,17,33,3,0,'#27302f'],['obs','Sala de observação',14,8,8,8,0,'#243238'],['arq','Arquivo de documentos',24,8,8,8,0,'#2e3330'],['lab','Laboratório',34,8,10,8,0,'#2a3b38'],['seg','Sala de segurança',14,21,8,8,0,'#232a33'],['c06','Área da Câmera 06',24,21,8,8,0,'#262c2a'],['s07','Sala 07',34,21,10,8,0,'#2d2a2a'],['elv','Elevador',45,15,5,7,0,'#303638'],['bel','Subsolo — Elevador',45,36,5,7,1,'#222a2c'],['bco','Subsolo — Corredor',22,38,23,3,1,'#1f2628'],['ori','Subsolo — Origem',10,34,12,11,1,'#1d2a28'],['arm','Subsolo — Arquivo M',26,42,8,7,1,'#22262b'],['nuc','Subsolo — Núcleo',36,30,8,7,1,'#262022'],['cic','Subsolo — Câmara dos Ciclos',46,30,8,5,1,'#1b2630'],['cel','Subsolo — Cela de Mara',51,38,5,5,1,'#2a2428'],['ctl','Subsolo — Controle',46,45,8,5,1,'#201a26']];
+const CON=[[17,16,2,1],[27,16,2,1],[38,16,2,1],[17,20,2,1],[27,20,2,1],[38,20,2,1],[29,41,2,1],[39,37,2,1],[44,32,2,1],[52,35,2,3],[52,43,2,2]];
+const DOORS=[{x:44,y:17,w:1,h:3,f:'power'},{x:38,y:20,w:2,h:1,f:'key'},{x:39,y:37,w:2,h:1,f:'reveal'},{x:44,y:32,w:2,h:1,f:'ch1'},{x:52,y:35,w:2,h:3,f:'cel'},{x:52,y:43,w:2,h:2,f:'ctlk'},{x:27,y:20,w:2,h:1,t:45}];
+const dOpen=d=>d.t?L.t<=d.t:!!S.flags[d.f];
+const O=(i,x,y,w,h,l,k,v,b=1)=>({i,x,y,w,h,l,k,v,b});
+const OBJ=[O('rec',9,14,1,1,'Terminal da recepção','term'),O('mir',2,17,1,2,'Espelho','mirror'),O('desk',4,16,4,1,'','desk'),O('glass',16,8,4,1,'Vidro de observação','glass'),O('nbook',20,10,1,1,'Registro estranho','doc',()=>S.cycle>=3,0),O('p60',29,8,2,1,'Documento: Protocolo 60','doc'),O('cab',25,8,2,1,'Armário trancado','cab'),O('shelf',25,12,6,1,'','shelf'),O('mach',36,10,3,2,'Máquina ASTER','mach'),O('panel',42,8,2,1,'Painel de controle','panel'),O('labb',34,13,2,2,'Laboratório B','cab'),O('cons',14,22,1,4,'Console de segurança','cons'),O('segt',20,27,1,1,'Terminal de registros','term'),O('cam',30,21,2,1,'Câmera 06','cam'),O('bed',35,26,3,2,'','bed'),O('d07',42,22,1,1,'Prontuário ASTER-07','doc'),O('mara',40,24,1,1,'Mara','npc'),O('elu',46,15,3,1,'Elevador','elev'),O('eld',46,36,3,1,'Elevador','elev'),O('mon',11,34,8,1,'Monitores','mon'),O('armt',29,48,2,1,'Arquivo M','term'),O('core',39,30,2,2,'Núcleo','core'),O('pods',47,30,6,1,'Cápsulas de ciclo','pod',()=>S.flags.ch1),O('t1',52,34,1,1,'Fita 1','doc',()=>S.flags.ch1,0),O('dia',52,40,1,1,'Diário de Mara','doc',()=>S.flags.ch1,0),O('t3',15,13,1,1,'Fita 3','doc',()=>S.flags.ch1,0),O('ctl',48,48,4,1,'Controle do Protocolo','mach',()=>S.flags.ch1),O('anc1',3,20,1,1,'Relógio quebrado','doc',()=>S.flags.ch2,0),O('anc2',36,22,1,1,'Fotografia','doc',()=>S.flags.ch2,0),O('anc3',25,26,1,1,'Gravador de fita','doc',()=>S.flags.ch2,0),O('sg6',26,19,1,1,'Painel da porta 06','term'),O('d1',9,20,2,1,'','bench'),O('d2',11,15,1,1,'','plant'),O('d3',21,9,1,2,'','lock'),O('d4',31,10,1,2,'','lock'),O('d5',40,9,2,2,'','tank'),O('d6',34,10,1,2,'','tank'),O('d7',17,24,3,1,'','desk'),O('d8',24,24,2,1,'','bench'),O('d9',43,26,1,2,'','lock'),O('d10',14,38,2,3,'','tank'),O('d11',27,44,1,4,'','shelf'),O('d12',32,44,1,4,'','shelf')];
+const KC={term:['#1c2a2a','#4fffb0'],mirror:['#2a3a40'],desk:['#2b2622'],doc:['#222'],cab:['#2a3236','#7fa'],shelf:['#26201a'],mach:['#222f33','#77eedd'],panel:['#2a2a30','#ffcc44'],cons:['#1d2630','#66ccff'],cam:['#181818','#ff4444'],bed:['#2a3040'],elev:['#3a4144','#88ffdd'],mon:['#10181c','#66ff88'],core:['#201418','#ff5555'],glass:['#1a2a32','#77ccdd'],npc:['#000'],pod:['#16282c','#66ffee'],plant:['#1e3320'],bench:['#3a2f26'],lock:['#27323a'],tank:['#16302a','#55ff99']};
+const MEMS={rec:['Terminal da recepção','O terminal sabia meu código antes de eu tocá-lo: ASTER-07.'],mir:['Reflexo','Meu reflexo reage com atraso. Ou eu reajo com atraso a ele.'],obs:['Sala de observação','Uma cadeira de observador aponta para o vidro. Para mim.'],note3:['Registro contraditório','"Pacientes: 0. Pacientes: 1. Pacientes: 1842." Os números mudam quando desvio o olhar.'],p60:['Protocolo 60','Ciclos de 60 segundos para apagar a memória do sujeito. O apagamento falhou com ASTER-07. Código do armário: 0607.'],cab:['Cartão ASTER','Um cartão de acesso com minha foto. Mais jovem. Sorrindo.'],mach:['Máquina ASTER','Cadeira com eletrodos. Ainda está quente. Alguém acabou de usá-la.'],panel:['Energia restaurada','Reativei a energia do elevador. O sistema registrou o comando antes de eu dá-lo.'],labb:['Laboratório B','Gravações numeradas até 1842. A etiqueta seguinte, em branco, está com minha letra.'],cons:['Console de segurança','Seis câmeras. A Câmera 06 aparece com o status: OBSERVANDO.'],segt:['Registro de rotas','O sistema anota cada rota minha e pede que eu não repita nenhuma.'],cam06:['Câmera 06','A lente me acompanhou. Algo no corredor também.'],pres:['Presença','Uma figura alta, sem rosto, some quando me aproximo. A rotina muda depois que ela passa.'],d07:['Sala 07','Prontuário: admissão voluntária. Motivo: esquecer alguém. Observação: Mara não deve ser lembrada.'],mara:['Mara','Mara me conhece. Tentou me tirar daqui. Disse para não olhar de volta para a Câmera 06.'],elev:['Descida','O elevador desceu além do que o prédio deveria ter.'],armt:['Arquivo M','Registros de Mara: ela me prendeu no ciclo para me proteger do que há no Núcleo.'],rev:['LOOP 1843','Os monitores confirmaram: SUJEITO CONSCIENTE. Pela primeira vez sei que estou preso.'],core:['Núcleo','O Núcleo pulsa no ritmo da minha respiração. Ele me chamou pelo nome.'],pod:['Câmara dos Ciclos','1842 cápsulas, cada uma com um rosto igual ao meu. A de número 1843 leva o meu nome.'],t1:['Fita 1','Mara gravou: o pedido de esquecer partiu de mim. Ninguém me prendeu aqui.'],t2:['Diário de Mara','Existiu um ASTER-06. Ele recusou o apagamento e ficou preso na Câmera 06.'],t3:['Fita 3','Mara escondeu isto fora do subsolo. O Controle do Protocolo aceita um único comando.'],ctl:['Controle do Protocolo','ASTER-06 falou comigo. A escolha entre ENCERRAR e CONTINUAR ficou para depois.'],a1:['Âncora: Relógio','O relógio parado em 00:60 marca onde tudo começou.'],a2:['Âncora: Fotografia','Eu e Mara, sorrindo, antes do Protocolo.'],a3:['Âncora: Gravador','Minha voz pedindo para não deixar ASTER-06 sozinho.'],fim:['Escolha final','Tomei a decisão no Controle do Protocolo.']};
+const PA=[['Todos os funcionários devem evacuar o prédio.','Sistema em modo de manutenção.'],['Você está sendo registrado.','Rotina estável. Por enquanto.'],['Registro duplicado detectado.','Documentos divergem. Ignore as divergências.'],['ASTER-07, você já passou por aqui.','Não siga a mesma rota.']];
+const PAX=['Memória externa detectada.','Rotina alterada.','ASTER-07, mantenha distância do Núcleo.','Por que você está olhando para a câmera?','Contagem de ciclos: %c.','Você foi mais longe do que o previsto.','Mantenha a calma, ASTER-07.','Câmara dos Ciclos: ocupação 1842.','Há outro sujeito neste ciclo.','ASTER-06 está em todos os ciclos.','Não deixe a escuridão te alcançar.'];
+const PS=[[20.5,18.5],[30.5,18.5],[40.5,18.5],[27.5,24.5],[18.5,24.5],[38.5,12.5],[17.5,11.5]];
+const PB=[[30.5,39.5],[38.5,39.5],[15.5,40],[49.5,32],[40,33]],WH=['Ele conta os seus passos.','Não olhe para trás.','06 está mais perto.','Você já esqueceu isto antes.','Fique parado. Talvez ele passe.'];const P={x:6.5*T,y:19*T,d:0,mv:0,t:0,st:0};
+/* ===== SAVE ===== */
+const Save={get K(){return'loop_aster_v1'+(CFG.slot>1?'_'+CFG.slot:'')},blank(){return{v:1,cycle:1,done:0,ch:1,mem:{},xp:0,flags:{},seen:[],pi:0,mt:0,fl:0}},
+read(){try{const o=JSON.parse(localStorage.getItem(this.K));if(o&&o.v===1&&Number.isFinite(o.cycle)&&o.mem&&typeof o.mem==='object'&&o.flags&&typeof o.flags==='object')return Object.assign(this.blank(),o)}catch(e){}return null},
+write(){try{S.fl=P.y>=30*T?1:0;localStorage.setItem(this.K,JSON.stringify(S));return 1}catch(e){return 0}},
+cfg(){try{localStorage.setItem('loop_aster_cfg',JSON.stringify(CFG))}catch(e){}}};
+S=Save.blank();
+/* ===== ÁUDIO ===== */
+const Au={c:null,init(){if(this.c===null)try{this.c=new(window.AudioContext||window.webkitAudioContext)()}catch(e){this.c=0}if(this.c&&this.c.state==='suspended')this.c.resume()},
+o(f,d,ty,v,at,f2){const c=this.c;if(!c||!CFG.vol)return;try{const t=c.currentTime+(at||0),o=c.createOscillator(),g=c.createGain();o.type=ty;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v*CFG.vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d)}catch(e){}},
+sfx(k){const m={step:()=>this.o(70+Math.random()*20,.06,'square',.05),int:()=>this.o(520,.1,'triangle',.15,0,780),term:()=>{this.o(900,.05,'square',.06);this.o(1200,.05,'square',.06,.07)},reset:()=>this.o(400,.9,'sawtooth',.12,0,40),alert:()=>{this.o(300,.15,'square',.1);this.o(300,.15,'square',.1,.2)},sus:()=>this.o(90,1.4,'sawtooth',.2,0,45),beat:()=>this.o(55,.18,'sine',.3),creak:()=>this.o(140,.9,'sawtooth',.08,0,60)};if(m[k])m[k]()}};
+/* ===== MUNDO ===== */
+const World={g:new Uint8Array(MW*MH),rc:new Uint8Array(MW*MH),
+init(){ROOMS.forEach((r,i)=>{for(let y=r[3];y<r[3]+r[5];y++)for(let x=r[2];x<r[2]+r[4];x++){this.g[y*MW+x]=1;this.rc[y*MW+x]=i}});
+CON.forEach(c=>{for(let y=c[1];y<c[1]+c[3];y++)for(let x=c[0];x<c[0]+c[2];x++){this.g[y*MW+x]=1;this.rc[y*MW+x]=c[1]<30?1:10}});
+OBJ.forEach(o=>{if(o.b)for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)this.g[y*MW+x]=2})},
+solid(px,py){const tx=Math.floor(px/T),ty=Math.floor(py/T);if(tx<0||ty<0||tx>=MW||ty>=MH)return 1;if(this.g[ty*MW+tx]!==1)return 1;for(const d of DOORS)if(!dOpen(d)&&tx>=d.x&&tx<d.x+d.w&&ty>=d.y&&ty<d.y+d.h)return 1;return 0},
+hit(x,y){return this.solid(x-6,y-5)||this.solid(x+6,y-5)||this.solid(x-6,y+5)||this.solid(x+6,y+5)},
+room(){const tx=P.x/T|0,ty=P.y/T|0;for(const r of ROOMS)if(tx>=r[2]&&tx<r[2]+r[4]&&ty>=r[3]&&ty<r[3]+r[5])return r;return null}};
+World.init();
+/* ===== MEMÓRIA ===== */
+const lvl=()=>1+(S.xp/45|0);
+const Mem={add(id){if(S.mem[id])return 0;S.mem[id]=S.cycle;const l=lvl();S.xp+=15;UI.toast('+ MEMÓRIA: '+MEMS[id][0]+(lvl()>l?' · LUCIDEZ AUMENTOU':''));Au.sfx('alert');Save.write();return 1}};
+/* ===== INTERAÇÕES ===== */
+const A={
+rec:c=>{Mem.add('rec');return c<2?['Terminal: INSTITUTO ASTER — Pesquisa da Memória Humana.','Último aviso: "Prédio em manutenção. Ninguém autorizado."','No canto da tela, um relógio marca 00:60 e não corre.']:c==2?['Uma nova linha na tela: "Visitante registrado: ASTER-07."','Eu não digitei nada.']:c==3?['A tela repete em colunas: ASTER-07 ASTER-07 ASTER-07.']:['"Bem-vindo de volta, ASTER-07."','"Ciclo '+c+'. Você chegou '+(c%2?'cedo':'tarde')+' demais."']},
+mir:c=>{Mem.add('mir');if(S.flags.ch2)return['O espelho está vazio. Só a luz vermelha da Câmera 06 aparece, atrás de mim.'];return c<2?['Meu reflexo: rosto cansado, jaleco claro. Nada de estranho.']:c<4?['O reflexo se move um instante depois de mim. Há um vulto atrás dele.']:['O reflexo sorri. Eu não.']},
+glass:c=>{Mem.add('obs');return c<3?['Uma sala de observação escura. Uma cadeira virada para o vidro.']:['A cadeira agora está virada para o lado de cá.'].concat(S.flags.ch2?['No vidro, por um instante, o reflexo de Mara me observa de dentro da sala escura.']:[])},
+nbook:c=>{Mem.add('note3');return['Registro: "Pacientes: 0. Pacientes: 1. Pacientes: 1842."','Os números mudam quando desvio o olhar.']},
+p60:c=>{Mem.add('p60');return['PROTOCOLO 60 — Confidencial.','"Ciclos de 60 segundos induzem esquecimento controlado."','"Falha de apagamento detectada em ASTER-07."','Anotação à mão: código do armário 0607.']},
+cab:c=>{if(!S.mem.p60)return['Armário trancado. Pede um código de quatro dígitos.'];if(S.flags.key)return['O armário está vazio. Sobrou só o espaço do cartão.'];S.flags.key=1;Mem.add('cab');return['Código 0607. O armário abre.','Dentro, um cartão de acesso com meu rosto — mais jovem, sorrindo.','Em algum lugar, uma porta destrava com um clique.']},
+mach:c=>{Mem.add('mach');return['MÁQUINA ASTER. Uma cadeira com eletrodos e cintos.','O estofado ainda está quente.',c>2?'O registro de uso mostra o horário atual.':'O registro de uso está apagado.','Diante da cadeira há uma segunda, voltada para ela. Marcas de quem só observa.']},
+panel:c=>{if(!S.flags.key)return['O painel exige um cartão de acesso ASTER.'];if(S.flags.power)return['ENERGIA ESTÁVEL. CICLO '+c+'.'];S.flags.power=1;Mem.add('panel');return['Passo o cartão. O painel acende.','ENERGIA DO ELEVADOR RESTAURADA.','No fim do corredor, uma porta pesada se abre.']},
+labb:c=>{Mem.add('labb');return['LABORATÓRIO B — gravações numeradas até 1842.','A etiqueta seguinte está em branco, com minha letra.']},
+cons:c=>{S.flags.sec=1;Mem.add('cons');return['CONSOLE DE SEGURANÇA — seis câmeras.','Cam 06: status OBSERVANDO. Uma luz vermelha acesa no corredor.']},
+segt:c=>{Mem.add('segt');return c<3?['Log de rotas: Recepção → Corredor → Segurança.']:['Log de rotas: ASTER-07 repetiu o caminho '+c+' vezes.','Anotação do sistema: "Não siga a mesma rota."',S.flags.ch1?'Observadora M. Voss acessou este ciclo 1842 vezes.':'Há um acesso remoto marcado: M.V.']},
+cam:c=>{if(!S.flags.sec)return['A Câmera 06 está inerte. O console de segurança deve mostrar mais sobre ela.'];if(S.flags.pres){Mem.add('cam06');return['A lente gira devagar e me acompanha.']}S.flags.pres=1;Mem.add('cam06');G.pa('Por que você está olhando para a câmera?');return['Encaro a lente. O alto-falante estala.','Nas luzes do corredor, algo se mexe devagar.']},
+d07:c=>{Mem.add('d07');return['PRONTUÁRIO ASTER-07.','"Admissão voluntária. Motivo: esquecer alguém."','"Observação: Mara não deve ser lembrada."','Rodapé: "Observadora designada: M. Voss."']},
+mara:c=>{const n=S.mt++;Mem.add('mara');return n==0?['Mara: ...Você voltou. Ou nunca saiu.','Mara: Eu sou Mara. Você me conhecia. Tentei te tirar daqui.','Mara: Não confie nos alto-falantes. E se a Câmera 06 piscar, não olhe de volta.','Mara: E não me procure sempre no mesmo lugar. O instituto me muda de sala a cada ciclo.']:S.flags.ch2?['Mara: Você falou com ele. Com ASTER-06.',S.flags.anc?'Mara: Você reuniu as três âncoras. Agora escolha quem vai ser.':'Mara: As âncoras são o que ele não consegue esquecer. Reúna-as antes da escolha.']:S.flags.ch1?['Mara: O Núcleo abriu uma passagem. Não achei que você chegaria lá.','Mara: Procure as fitas. E não confie em tudo que a Câmera 06 mostrar.']:S.flags.reveal?['Mara: Você viu os monitores. Então sabe.','Mara: Esta é a sua primeira vez consciente. Não deixe o Núcleo te chamar.']:[n%2?'Mara: Ciclo '+c+'. Você está mais perto.':'Mara: Já perdi a conta de quantas vezes falamos.','Mara: O elevador leva à Origem. Eu não consigo descer.','Mara: Desculpe ficar te olhando. Preciso ver você para saber que ainda é você.']},
+elu:c=>{if(!S.flags.power)return['O elevador está sem energia. O painel do laboratório controla a alimentação.'];S.flags.elev=1;Mem.add('elev');const r=['As portas se fecham. A descida dura mais do que deveria.'];r.cb=()=>G.warp(47.5,40);return r},
+eld:c=>{const r=['As portas se fecham. Subimos devagar.'];r.cb=()=>G.warp(47.5,19);return r},
+mon:c=>{if(S.flags.reveal)return['Os monitores repetem: LOOP 1843 — SUJEITO CONSCIENTE.'];const n=G.need();if(n.length)return['Os monitores exibem apenas estática.','Ainda não entendo o suficiente: falta '+MEMS[n[0]][0]+'.'];const r=['Os monitores se acendem, um a um.'];r.cb=()=>G.reveal();return r},
+armt:c=>{Mem.add('armt');return['ARQUIVO M — Mara Voss, pesquisadora.','"Ela me prendeu no ciclo para me proteger do que há no Núcleo."']},
+core:c=>{Mem.add('core');S.flags.ch1=1;S.ch=2;Save.write();return['O Núcleo pulsa no ritmo da minha respiração.','"ASTER-07, mantenha distância do Núcleo."','FIM DO CAPÍTULO 1 — o instituto nunca esteve abandonado. Ele estava esperando.','Uma passagem se abre a leste do Núcleo.']},
+pods:c=>{Mem.add('pod');return['CÁPSULAS DE CICLO — 1842 delas, enfileiradas.','Cada uma guarda um rosto igual ao meu, em repouso.','A cápsula 1843 está vazia e leva o meu nome.']},
+t1:c=>{S.flags.cel=1;Mem.add('t1');chk();return['FITA 1 — gravação de Mara, ciclo 0.','"Se você ouvir isto, o Protocolo 60 falhou de novo."','"Não fui eu quem te prendeu aqui. Foi você mesmo, pedindo para esquecer."','Uma porta ao sul da Câmara destrava.']},
+dia:c=>{Mem.add('t2');chk();return['DIÁRIO DE MARA — "Eu me voluntariei para te vigiar. Antes de você, existiu um ASTER-06."','"Ele recusou o apagamento e ficou preso na Câmera 06. Tudo o que ele vê, ele repete."','"Se ele aparecer, não corra. Ele só quer ser lembrado."']},
+t3:c=>{Mem.add('t3');chk();return['FITA 3 — voz de Mara, ciclo 1841.','"Escondi isto fora do subsolo porque o sistema não olha para onde você já esteve."','"O Controle do Protocolo fica no extremo sul. Ele aceita um único comando."']},
+ctl:c=>{if(!S.flags.ctlk)return['Painel bloqueado. Faltam registros para liberar o acesso: Fita 1, Diário de Mara e Fita 3.'];if(S.flags.end)return['O Controle está inativo. Só resta eco.'];
+if(S.flags.ch2){if(!S.flags.anc)return['A voz de ASTER-06 sussurra do teto: "Ainda faltam âncoras. Relógio, fotografia, gravador."','"Sem elas a escolha não prende. O instituto me apaga e te devolve ao ciclo."'];const r=['Os três objetos pulsam na minha mão. O painel responde.','ASTER-06: "Escolha, ASTER-07. Não vou mentir: não sei o que existe depois."','"Você trouxe o relógio, a fotografia e o gravador. Eu me lembro de tudo agora."'];if(maraAll())r.push('No painel, uma terceira opção pisca, quase apagada: LEMBRAR.');
+r.cb=()=>UI.choice('CONTROLE DO PROTOCOLO 60',['ENCERRAR — apagar o Protocolo','CONTINUAR — seguir ASTER-06'].concat(maraAll()?['LEMBRAR — chamar Mara']:[]),i=>{const k='ABC'[i],e=ENDS(k);G.fin(e[0],e[1],k)});return r}
+S.flags.ch2=1;S.ch=3;Mem.add('ctl');const r=['CONTROLE DO PROTOCOLO 60.','Comandos disponíveis: ENCERRAR / CONTINUAR.','A Câmera 06 acende no teto. Uma voz gasta responde: "Eu fui ASTER-06."','"Ainda não. Reúna três âncoras: o relógio da recepção, a fotografia da Sala 07 e o gravador da Câmera 06."','"Depois decida. Mas ande depressa: a escuridão já sabe o seu nome."','FIM DO CAPÍTULO 2. CAPÍTULO 3 — AS ÂNCORAS.'];r.cb=()=>{G.shk=1;G.fl=2;G.pa('LOOP 1844 — INICIANDO.')};return r},
+anc1:c=>{Mem.add('a1');chka();return['Um relógio de parede quebrado, parado em 00:60.','Atrás do vidro rachado, um bilhete: "Foi aqui que acordei pela primeira vez."']},
+anc2:c=>{Mem.add('a2');chka();return['Uma fotografia: eu e Mara no pátio do instituto, sorrindo.','No verso, a letra dela: "Se esquecer, lembre disto."']},
+anc3:c=>{Mem.add('a3');chka();return['Um gravador de fita com a etiqueta 06.','Ao apertar PLAY, ouço a minha voz: "Não deixe ele ficar sozinho."']},
+sg6:c=>['PORTA 06 — TRAVA DE REINÍCIO.','Destrava quando o relógio chega a 00:45. Planeje a rota.']};
+const spots=()=>P.y<30*T?PS:S.flags.ch1?PB:null;
+const pres=()=>{if(!S.flags.pres)return null;if(G.bk>0&&G.bp)return G.bp;const a=spots();if(!a)return null;if(S.flags.ch2&&G.ps&&G.psf===(P.y<30*T))return G.ps;return a[(S.cycle+S.pi)%a.length]};
+const maraAll=()=>['mara','d07','t1','t2','t3','armt','a2'].every(k=>S.mem[k]);
+const ENDS=k=>{const m=S.mem;return k==='A'?['FINAL: SILÊNCIO',['Digito ENCERRAR. As luzes do instituto se apagam, uma a uma.','ASTER-06 surge ao meu lado, sem pressa: "Obrigado por se lembrar de mim."','Relógio, fotografia, gravador. Cada âncora se apaga na minha mão.','Nos monitores, 1842 rostos fecham os olhos. Depois, o meu.',m.mara?'Em algum lugar acima, Mara ouve o silêncio e entende que acabou.':'Em algum lugar acima, alguém ouve o silêncio e entende que acabou.','Silêncio.']]:
+k==='B'?['FINAL: LOOP 1844',['Digito CONTINUAR. O elevador sobe sem que eu o chame.','Na recepção, a porta de saída está aberta. Lá fora, é a mesma recepção.','ASTER-06 caminha ao meu lado. Pela primeira vez, ele tem passos.','Mara está sentada na cadeira da Máquina ASTER, diante de uma tela com o meu rosto.','Ela sussurra: "Preciso ver você para saber que ainda é você."','Na tela, o relógio marca 00:60. LOOP 1844 — SUJEITO CONSCIENTE.']]:
+['FINAL: LEMBRANÇA',['Digito o nome dela. A porta do Controle se abre e Mara entra, com a fotografia nas mãos.','Mara: "Você pediu para me esquecer. Eu deixei, porque eu era a dor que você queria apagar."','Os 1842 rostos nos monitores abrem os olhos. Cada ciclo volta para dentro de mim.','ASTER-06 deixa a Câmera 06. A figura sem rosto ganha um rosto: o meu, mais cansado.','Nós três caminhamos pelo corredor. Todas as luzes se acendem.','A porta de saída se abre. Lá fora, pela primeira vez, existe um lado de fora.','O relógio da recepção, parado em 00:60, finalmente avança.']]};
+const chka=()=>{const m=S.mem;if(m.a1&&m.a2&&m.a3&&!S.flags.anc){S.flags.anc=1;UI.toast('Âncoras reunidas. Volte ao Controle do Protocolo.')}};
+const chk=()=>{const m=S.mem;if(m.t1&&m.t2&&m.t3&&!S.flags.ctlk){S.flags.ctlk=1;UI.toast('Algo destrava no extremo sul do subsolo.')}};
+const MS=[[40,24],[6,20],[18,13],[40,12],[20,23],[27,24]];
+function moveMara(){const o=OBJ.find(q=>q.i==='mara'),g=World.g;g[o.y*MW+o.x]=1;const q=MS[S.cycle%MS.length];o.x=q[0];o.y=q[1];g[o.y*MW+o.x]=2}
+const EK='loop_aster_ends',endsGet=()=>{try{return JSON.parse(localStorage.getItem(EK))||[]}catch(e){return[]}},endsAdd=k=>{try{const a=endsGet();if(!a.includes(k)){a.push(k);localStorage.setItem(EK,JSON.stringify(a))}}catch(e){}};
+const KN={u:'Cima',d:'Baixo',l:'Esquerda',r:'Direita',e:'Interagir'};
+/* ===== LOOP ===== */
+const L={t:60,pa:0,reset(){this.t=CFG.cyc||60;moveMara();this.pa=0;G.tn=0;G.bk=0;G.bp=null;G.ps=null;G.sc=-1;const b=S.flags.reveal;P.x=(b?47.5:6.5)*T;P.y=(b?40:19)*T;P.st=0;G.snap();G.fl=0},
+next(){if(G.state!=='play')return;G.state='trans';$('fade').textContent='CICLO '+(S.cycle+1);$('fade').style.opacity=1;Au.sfx('reset');setTimeout(()=>{S.cycle++;S.done++;this.reset();Save.write();$('fade').style.opacity=0;setTimeout(()=>{if(G.state==='trans')G.state='play'},600)},900)}};
+/* ===== HISTÓRIA ===== */
+/* ===== UI ===== */
+const UI={cur:'menu',from:'menu',tm:0,
+show(h,c){const s=$('scr');s.innerHTML=h;s.className=c||'';s.style.display=c==='mn'?'flex':'block';s.scrollTop=0},
+ask(m,ok){const d=document.createElement('div');d.id='cf';d.innerHTML='<div><p>'+m+'</p><button id="cy">Apagar e começar</button><button id="cn">Cancelar</button></div>';document.body.appendChild(d);$('cy').onclick=()=>{d.remove();ok()};$('cn').onclick=()=>d.remove()},
+choice(m,b,cb){G.state='ui';UI.cur='choice';const d=document.createElement('div');d.id='cf';d.innerHTML='<div><p>'+m+'</p>'+b.map((x,i)=>'<button data-i="'+i+'">'+x+'</button>').join('')+'</div>';document.body.appendChild(d);d.querySelectorAll('button').forEach(e=>e.onclick=()=>{d.remove();UI.cur='';cb(+e.dataset.i)})},hide(){$('scr').style.display='none';UI.cur=''},
+toast(t){const e=$('tt');e.textContent=t;clearTimeout(this.tm);this.tm=setTimeout(()=>e.textContent='',3500)},
+menu(){G.state='menu';UI.cur='menu';$('hud').style.display=$('touch').style.display='none';const sv=Save.read();
+const n=sv?Object.keys(sv.mem).length:0,info=sv?'Ciclo '+sv.cycle+' · '+n+'/'+Object.keys(MEMS).length+' memórias · Lucidez '+(1+(sv.xp/45|0)):'Nenhum progresso salvo';
+this.show('<div class="mw"><div class="tg">PROTOCOLO 60 · 00:60</div><h1 class="lt" data-t="LOOP">LOOP</h1><div class="sb">INSTITUTO ASTER</div><div class="sv">'+info+'</div><div class="sl">'+[1,2,3].map(n=>'<button data-s="'+n+'" class="'+(CFG.slot===n?'on':'')+'">Slot '+n+'</button>').join('')+'</div><div class="mb"><button id="n" '+(sv?'':'class="pri"')+'><span>01</span>Novo jogo</button><button id="c" '+(sv?'class="pri"':'disabled')+'><span>02</span>Continuar</button><button id="me"><span>03</span>Memórias</button><button id="op"><span>04</span>Opções</button><button id="fi"><span>05</span>Finais</button><button id="cr"><span>06</span>Créditos</button></div><div class="ft">ASTER-07 · PROJETO INDEPENDENTE</div></div>','mn');
+bind('n',()=>sv?UI.ask('Já existe uma partida salva. Começar um novo jogo apaga todo o progresso. Continuar?',()=>G.start(0)):G.start(0));bind('c',()=>G.start(1));bind('me',()=>UI.mems('menu'));bind('op',()=>UI.opts('menu'));bind('cr',()=>UI.cred('menu'));bind('fi',()=>UI.ends('menu'));document.querySelectorAll('.sl button').forEach(b=>b.onclick=()=>{CFG.slot=+b.dataset.s;Save.cfg();UI.menu()})},
+pause(){G.state='ui';UI.cur='pause';this.show('<h1>PAUSA</h1><div class="m"><button id="a">Continuar</button><button id="b">Memórias</button><button id="c">Configurações</button><button id="d">Salvar</button><button id="e">Voltar ao menu</button></div><p id="sm"></p>');
+bind('a',()=>UI.resume());bind('b',()=>UI.mems('pause'));bind('c',()=>UI.opts('pause'));bind('d',()=>{$('sm').textContent=Save.write()?'Jogo salvo.':'Não foi possível salvar neste navegador.'});bind('e',()=>{Save.write();UI.menu()})},
+resume(){this.hide();G.state='play'},
+back(){this.from==='menu'?this.menu():this.from==='pause'?this.pause():this.resume()},
+mems(from){this.from=from;this.cur='mems';const d=G.started?S:(Save.read()||Save.blank()),ids=Object.keys(MEMS),n=ids.filter(i=>d.mem[i]).length;
+this.show('<h1>MEMÓRIAS</h1><p>'+n+'/'+ids.length+' fragmentos · Lucidez '+(1+(d.xp/45|0))+' · XP '+d.xp+'</p>'+ids.map(i=>d.mem[i]?'<div class="it"><b>'+MEMS[i][0]+'</b> <small>— descoberta no ciclo '+d.mem[i]+'</small><br>'+MEMS[i][1]+'</div>':'<div class="it un">??? Fragmento desconhecido</div>').join('')+'<button id="bk">Voltar</button>');bind('bk',()=>UI.back())},
+opts(from){this.from=from;this.cur='opts';this.show('<h1>OPÇÕES</h1><label>Volume dos efeitos<input type="range" id="v" min="0" max="100" value="'+CFG.vol*100+'"></label><label>Intensidade dos efeitos visuais<input type="range" id="f" min="0" max="100" value="'+CFG.fx*100+'"></label><label>Escala da interface<input type="range" id="u" min="80" max="140" value="'+CFG.ui*100+'"></label><label><input type="checkbox" id="k" '+(CFG.calm?'checked':'')+'> Reduzir tremores e distorções</label><label>Duração do ciclo: <b id="cyv">'+CFG.cyc+'</b>s (vale no próximo ciclo)<input type="range" id="cy" min="45" max="120" step="15" value="'+CFG.cyc+'"></label><label><input type="checkbox" id="sf" '+(CFG.soft?'checked':'')+'> Modo suave (menos tensão e apagões curtos)</label><label><input type="checkbox" id="fcn" '+(CFG.fc?'checked':'')+'> Mostrar contador de FPS</label><div style="margin:12px 0">Limite de FPS: '+[30,60,120].map(f=>'<button class="fb'+(CFG.fps===f?' sel':'')+'" data-f="'+f+'">'+f+'</button>').join('')+'</div><div>'+Object.keys(KN).map(a=>'<button class="kb" data-a="'+a+'">'+KN[a]+': '+CFG.keys[a].toUpperCase()+'</button>').join('')+'</div><p style="max-width:320px;margin:12px auto;text-align:left">Controles: WASD/setas mover · Shift correr · E ou Enter interagir · M mapa · Esc pausa. No celular: joystick e botão E.</p><button id="bk">Voltar</button>');
+const ap=()=>{document.documentElement.style.setProperty('--u',CFG.ui);Save.cfg()};
+$('v').oninput=e=>{CFG.vol=e.target.value/100;Au.init();Au.sfx('int');ap()};$('f').oninput=e=>{CFG.fx=e.target.value/100;ap()};$('u').oninput=e=>{CFG.ui=e.target.value/100;ap()};$('k').onchange=e=>{CFG.calm=e.target.checked?1:0;ap()};$('fcn').onchange=e=>{CFG.fc=e.target.checked?1:0;if(!CFG.fc)$('fp').textContent='';ap()};document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{CFG.fps=+b.dataset.f;ap();UI.opts(UI.from)});$('cy').oninput=e=>{CFG.cyc=+e.target.value;$('cyv').textContent=CFG.cyc;ap()};$('sf').onchange=e=>{CFG.soft=e.target.checked?1:0;ap()};document.querySelectorAll('.kb').forEach(b=>b.onclick=()=>{In.rb=b.dataset.a;b.textContent='pressione uma tecla…'});bind('bk',()=>UI.back())},
+ends(from){this.from=from;this.cur='ends';const d=endsGet(),N={A:['Silêncio','Encerre o Protocolo.'],B:['LOOP 1844','Siga ASTER-06.'],C:['Lembrança','Descubra tudo sobre a Mara. Há uma opção secreta no Controle.']};
+this.show('<h1>FINAIS</h1><p>'+d.length+'/3 desbloqueados</p>'+['A','B','C'].map(k=>d.includes(k)?'<div class="it"><b>'+N[k][0]+'</b><br><button data-k="'+k+'">Rever cena</button></div>':'<div class="it un">??? <small>'+N[k][1]+'</small></div>').join('')+'<button id="bk">Voltar</button>');
+bind('bk',()=>UI.back());document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k,e=ENDS(k);UI.hide();G.fin(e[0],e[1],k,1)})},
+cred(from){this.from=from;this.cur='cred';this.show('<h1>CRÉDITOS</h1><p>LOOP — Instituto Aster<br>Projeto independente em HTML5, Canvas 2D e Web Audio.<br>Todos os gráficos e sons são gerados por código.</p><button id="bk">Voltar</button>');bind('bk',()=>UI.back())},
+map(){G.state='ui';this.from='play';this.cur='map';this.show('<h1>MAPA</h1><canvas id="mc" style="position:static;width:340px;height:290px;border:1px solid #234"></canvas><p>Salas exploradas: '+S.seen.length+'/'+ROOMS.length+'<br>Áreas não visitadas permanecem ocultas.</p><button id="bk">Voltar</button>');bind('bk',()=>UI.back());
+const m=$('mc');m.width=340;m.height=290;const c=m.getContext('2d');c.font='9px monospace';
+ROOMS.forEach(r=>{if(!S.seen.includes(r[0]))return;const y=r[6]?150+(r[3]-30)*6:(r[3]-8)*6;c.fillStyle='#2b4a45';c.fillRect(r[2]*6,y,r[4]*6,r[5]*6);c.strokeStyle='#7fe';c.strokeRect(r[2]*6+.5,y+.5,r[4]*6-1,r[5]*6-1);c.fillStyle='#cfe';c.fillText(r[1].replace('Subsolo — ','').slice(0,13),r[2]*6+2,y+11)});
+c.fillStyle='#456';c.fillText('— SUBSOLO —',4,146);const py=P.y>=30*T?150+(P.y/T-30)*6:(P.y/T-8)*6;c.fillStyle='#f44';c.beginPath();c.arc(P.x/T*6,py,4,0,7);c.fill()}};
+/* ===== JOGO ===== */
+const G={fc:null,state:'menu',started:0,dlg:null,gt:0,tn:0,bk:0,bp:null,ps:null,psf:0,pv:0,pn:0,sc:-1,tw:0,cx:0,cy:0,shk:0,fl:0,cd:0,bt:0,near:null,room:null,pt:0,touch:matchMedia('(pointer:coarse)').matches||'ontouchstart' in window,
+need(){return['mach','p60','d07','cam06'].filter(k=>!S.mem[k])},
+obj(){const f=S.flags,m=S.mem;if(f.end)return'Final alcançado — o ciclo continua';if(f.ch2)return!f.anc?'Reúna as âncoras ('+['a1','a2','a3'].filter(k=>m[k]).length+'/3): relógio, fotografia, gravador':'Volte ao Controle do Protocolo e decida';if(f.ch1)return!m.pod?'Passe pelo Núcleo e entre na Câmara dos Ciclos':!m.t1?'Examine a Fita 1 na Câmara dos Ciclos':!m.t2?'Entre na cela ao sul da Câmara':!m.t3?'Procure a Fita 3 na Sala de Observação':'Acesse o Controle do Protocolo, no extremo sul';if(f.reveal)return'Descubra o que há no Núcleo';if(f.elev){const n=this.need();return n.length?'Entenda: '+MEMS[n[0]][0]:'Investigue os monitores da Origem'}if(f.power)return'Pegue o elevador para o subsolo';if(f.key)return'Restaure a energia no Laboratório';if(m.p60)return'Abra o armário do Arquivo';if(m.rec)return'Procure o Protocolo 60 no Arquivo';return'Examine o terminal da recepção'},
+start(c){if(!c)try{localStorage.removeItem(Save.K)}catch(e){}S=c?(Save.read()||Save.blank()):Save.blank();this.started=1;this.dlg=null;$('dlg').style.display='none';$('rev').style.display='none';$('fade').style.opacity=0;$('tt').textContent='';this.shk=0;this.fl=0;this.cd=0;this.near=null;this.room=null;P.d=0;P.mv=0;P.t=0;L.reset();UI.hide();$('hud').style.display='block';$('touch').style.display=this.touch?'block':'none';this.state='play';Save.write();if(!c)this.intro()},
+snap(){this.cx=clamp(P.x-W/Z/2,0,Math.max(0,MW*T-W/Z));this.cy=clamp(P.y-H/Z/2,0,Math.max(0,MH*T-H/Z))},
+say(l,t){this.dlg={l,i:0,t:t||'',cb:l.cb};this.rd()},
+rd(){const d=this.dlg,e=$('dlg');e.style.display='block';e.innerHTML='<b>'+d.t+'</b>'+d.l[d.i]+'<i>▶ <u id="sk">pular</u></i>';$('sk').onpointerdown=ev=>{ev.stopPropagation();ev.preventDefault();G.dlgSkip()}},
+adv(){const d=this.dlg;d.i++;if(d.i>=d.l.length){this.dlg=null;$('dlg').style.display='none';if(d.cb)d.cb()}else this.rd()},
+act(){Au.init();if(this.dlg){this.adv();return}if(this.state!=='play'||!this.near)return;const o=this.near,f=A[o.i];if(!f)return;Au.sfx(o.k==='term'||o.k==='cons'?'term':'int');this.say(f(S.cycle),o.l)},
+pa(t){const e=$('cap');e.textContent=t;e.style.opacity=1;clearTimeout(this.pt);this.pt=setTimeout(()=>e.style.opacity=0,4200);Au.sfx('alert')},
+paLine(k){const c=S.cycle;if(c<=4)return PA[c-1][k];const p=PAX.filter(s=>(S.flags.pres||!/câmera/.test(s))&&(S.flags.reveal||!/Núcleo/.test(s))&&(S.flags.ch1||!/Câmara|outro/.test(s))&&(S.flags.ch2||!/ASTER-06 está|escuridão/.test(s)));return p[(c*3+k*5)%p.length].replace('%c',c)},
+warp(x,y){this.state='trans';$('fade').textContent='';$('fade').style.opacity=1;Au.sfx('reset');setTimeout(()=>{P.x=x*T;P.y=y*T;this.snap();Save.write();$('fade').style.opacity=0;this.state='play'},800)},
+reveal(){this.state='cut';const r=$('rev'),e=$('r2'),b=$('rb');e.classList.add('gl');r.style.display='flex';e.textContent='';b.style.display='none';b.textContent='CONTINUAR';this.fc=null;$('fc').style.display='none';$('r1').textContent='MONITORES DO SUBSOLO — SINAL RECEBIDO';Au.sfx('sus');
+const txt='LOOP 1843 — SUJEITO CONSCIENTE.';let i=0;setTimeout(()=>{const iv=setInterval(()=>{e.textContent=txt.slice(0,++i);if(i%4==0)Au.sfx('term');if(i>=txt.length){clearInterval(iv);Au.sfx('sus');setTimeout(()=>b.style.display='block',1200)}},110)},2200);
+b.onclick=()=>{r.style.display='none';S.flags.reveal=1;Mem.add('rev');S.xp+=25;L.t=Math.max(L.t,25);this.shk=1;Save.write();this.state='play'}},
+dlgSkip(){const d=this.dlg;if(!d)return;this.dlg=null;$('dlg').style.display='none';if(d.cb)d.cb()},
+dica(){if(this.state!=='play'||this.dlg)return;const f=S.flags,m=S.mem,n=this.need();this.say([f.end?'Tente os outros finais. O secreto exige descobrir tudo sobre a Mara.':f.ch2?(!f.anc?'Âncoras: relógio na Recepção, fotografia na Sala 07, gravador na Área da Câmera 06 (a porta dela só abre depois dos primeiros 15 segundos do ciclo).':'Volte ao Controle do Protocolo, no extremo sul do subsolo.'):f.ch1?(!m.pod?'Do Núcleo, siga a passagem a leste.':!m.t1?'A Fita 1 está na Câmara dos Ciclos.':!m.t2?'A cela de Mara fica ao sul da Câmara.':!m.t3?'A Fita 3 está na Sala de Observação, no andar de cima.':'O Controle fica no extremo sul do subsolo.'):f.reveal?'O Núcleo fica ao norte do corredor do subsolo.':f.elev?(n.length?'Ainda falta descobrir: '+n.map(k=>MEMS[k][0]).join(', ')+'.':'Os monitores ficam na Origem, a oeste do subsolo.'):f.power?'O elevador fica no extremo leste do corredor central.':f.key?'O painel de controle fica no Laboratório, a nordeste.':m.p60?'O armário trancado está no Arquivo; o código está no Protocolo 60.':m.rec?'O Arquivo de documentos fica ao norte do corredor, no meio.':'O terminal da recepção fica na sala onde você acordou.'],'DICA')},
+bkp(){this.bp=null;for(let k=0;k<8;k++){const a=S.cycle*2.4+k*.785,x=P.x+Math.cos(a)*140,y=P.y+Math.sin(a)*140;if(!World.solid(x,y)&&!World.solid(x,y+8)){this.bp=[x/T,y/T];break}}},
+fin(t,l,k,rp){this.state='cut';const r=$('rev'),e=$('r2'),b=$('rb');e.classList.add('gl');r.style.display='flex';b.style.display='none';b.textContent='VOLTAR AO MENU';$('r1').textContent=t;e.textContent='';if(!rp){S.flags.end=k;S.ch=4;Mem.add('fim');Save.write();endsAdd(k)}Au.sfx('sus');$('fc').style.display='block';this.fc={k,i:0,ts:this.gt};if(!rp)l=l.concat(['Ciclos vividos: '+S.cycle+' · Memórias: '+Object.keys(S.mem).length+'/'+Object.keys(MEMS).length+' · Lucidez '+lvl()]);let i=0;const nx=()=>{if(i>=l.length){b.style.display='block';return}this.fc={k,i:Math.min(i,SC[k].length-1),ts:this.gt};e.textContent=l[i++];Au.sfx('term');setTimeout(nx,3600)};setTimeout(nx,1800);b.onclick=()=>{r.style.display='none';b.textContent='CONTINUAR';this.fc=null;$('fc').style.display='none';UI.menu()}},
+intro(){this.state='cut';const L=['Instituto Aster. Um centro de pesquisa sobre a memória humana. Abandonado, dizem.','Lá dentro, as luzes ainda piscam, como se alguém continuasse trabalhando.','O relógio da parede marca 00:60. E ele não anda.','Acordo no chão da recepção. Não lembro como cheguei aqui.','No meu crachá, um nome que eu não reconheço: ASTER-07.'],r=$('rev'),e=$('r2'),b=$('rb'),tk=this.itk={};r.style.display='flex';$('r1').textContent='';e.textContent='';e.classList.remove('gl');$('fc').style.display='block';b.style.display='block';b.textContent='PULAR';let i=0;
+const end=()=>{if(this.itk!==tk)return;this.itk=null;r.style.display='none';$('fc').style.display='none';b.textContent='CONTINUAR';this.fc=null;e.classList.add('gl');this.state='play';this.say(['Preciso entender este lugar antes que o tempo acabe.','Dica: aproxime-se de objetos brilhantes e toque no aviso (ou use E) para interagir.','Dica: o ciclo reinicia a cada 60 segundos, mas o que descubro permanece. O botão ? mostra uma pista.'],'ASTER-07')};
+const nx=()=>{if(this.itk!==tk)return;if(i>=L.length){setTimeout(end,1500);return}this.fc={k:'I',i,ts:this.gt};e.textContent=L[i++];setTimeout(nx,4200)};setTimeout(nx,600);b.onclick=end;this.introEnd=end},
+esc(){if(this.state==='play')UI.pause();else if(UI.cur==='pause')UI.resume();else if(['mems','opts','cred','map','ends'].includes(UI.cur))UI.back()},
+mapk(){if(this.state==='play')UI.map();else if(UI.cur==='map')UI.back()},
+update(dt){this.gt+=dt;const pr=$('pr');
+if(this.state==='play'||this.state==='menu'){this.cx+=(clamp(P.x-W/Z/2,0,Math.max(0,MW*T-W/Z))-this.cx)*Math.min(1,dt*6);this.cy+=(clamp(P.y-H/Z/2,0,Math.max(0,MH*T-H/Z))-this.cy)*Math.min(1,dt*6)}
+if(this.fl>0)this.fl-=dt;if(this.cd>0)this.cd-=dt;if(this.shk>0)this.shk=Math.max(0,this.shk-dt);
+if(this.state!=='play'||this.dlg){pr.style.display='none';return}
+L.t-=dt;const sc=Math.floor(L.t);if(sc!==this.sc){this.sc=sc;if(S.flags.ch2){if(sc===41||sc===17){this.bk=CFG.soft?2:3.2;this.bkp();Au.sfx('sus');this.tn=Math.min(1,this.tn+.2)}else if(sc===43||sc===19)this.fl=.7;else if(sc%19===8)Au.sfx('creak')}}
+if(this.bk>0)this.bk-=dt;
+if(S.flags.ch2&&(this.pn-=dt)<=0&&!(this.pv>.2)){this.pn=7;const a=spots();if(a){let b=null,bd=1e9;for(const q of a){const d=Math.hypot(P.x-q[0]*T,P.y-q[1]*T);if(d>=200&&d<bd){bd=d;b=q}}this.ps=b;this.psf=P.y<30*T}}
+if(L.t<53&&L.pa<1){L.pa=1;this.pa(this.paLine(0))}if(L.t<24&&L.pa<2){L.pa=2;this.pa(this.paLine(1))}
+const v=In.vec(),sp=(In.k.shift?1.6:1)*118,dx=v[0]*sp*dt,dy=v[1]*sp*dt,n=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/3)||1;
+for(let i=0;i<n;i++){if(!World.hit(P.x+dx/n,P.y))P.x+=dx/n;if(!World.hit(P.x,P.y+dy/n))P.y+=dy/n}
+P.mv=Math.hypot(v[0],v[1])>.1;if(P.mv){P.t+=dt;P.d=Math.abs(v[0])>Math.abs(v[1])?(v[0]>0?3:2):(v[1]>0?0:1);P.st+=dt*sp;if(P.st>34){P.st=0;Au.sfx('step')}}
+const r=World.room();if(r){this.room=r;if(!S.seen.includes(r[0]))S.seen.push(r[0])}
+let best=null,bd=26;for(const o of OBJ){if(!o.l||(o.v&&!o.v()))continue;const ex=Math.max(o.x*T-P.x,0,P.x-(o.x+o.w)*T),ey=Math.max(o.y*T-P.y,0,P.y-(o.y+o.h)*T),d=Math.hypot(ex,ey);if(d<bd){bd=d;best=o}}
+this.near=best;if(best){pr.style.display='block';pr.textContent=(this.touch?'TOCAR ▸ ':'[E] ')+best.l}else pr.style.display='none';
+const s=pres();let nr=this.bk>0;if(s){const d=Math.hypot(P.x-s[0]*T,P.y-s[1]*T);
+if(d<110&&this.cd<=0){this.cd=S.flags.ch1?7:10;this.fl=1.3;this.shk=.6;S.pi++;if(S.flags.ch2)this.tn=Math.min(1,this.tn+.3);Au.sfx('sus');if(Mem.add('pres'))this.pa('Rotina alterada.')}
+nr=nr||(d<260&&this.pv>.25);if((d<300||this.tn>.2)&&CFG.fx&&(this.bt-=dt)<=0){this.bt=1.1-this.tn*.7;Au.sfx('beat')}}
+if(S.flags.ch2){this.tn=clamp(this.tn+(nr?(CFG.soft?.14:.28):-.12)*dt,0,1);if(this.tn>.55&&!this.tw){this.tw=1;this.pa(WH[(S.cycle+S.pi)%WH.length])}if(this.tn<.3)this.tw=0;if(this.tn>=1){this.tn=.5;this.pa('Rotina alterada.');L.t=0}}
+if(L.t<=0)L.next();
+$('hl').innerHTML='ASTER-07 · CICLO '+S.cycle+' · LUCIDEZ '+lvl()+' · CAP '+(S.flags.ch2?3:S.flags.ch1?2:1)+'<br><small>'+(this.room?this.room[1]:'')+'</small>';
+const t=Math.max(0,Math.ceil(L.t));$('ht').textContent=t>60?'0'+(t/60|0)+':'+(t%60<10?'0':'')+t%60:'00:'+(t<10?'0':'')+t;$('ht').className=t<=10?'lo':'';$('ho').textContent='▸ '+this.obj()}};
+/* ===== ENTRADA ===== */
+const In={k:{},jx:0,jy:0,
+init(){addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(this.rb){if(k!=='escape')CFG.keys[this.rb]=k;this.rb=null;Save.cfg();UI.opts(UI.from);return}this.k[k]=1;Au.init();if(k===CFG.keys.e||k==='enter'){if(G.state!=='menu'&&G.state!=='ui')G.act()}if(k==='escape')G.esc();if(k==='m')G.mapk();if(k==='h')G.dica();if(k==='x'&&G.dlg)G.dlgSkip();if(k.startsWith('arrow')||k===' ')e.preventDefault()});
+addEventListener('keyup',e=>this.k[e.key.toLowerCase()]=0);
+const j=$('joy'),kn=$('kn');let id=null;const mv=e=>{const r=j.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;const l=Math.hypot(x,y),m=50;if(l>m){x*=m/l;y*=m/l}kn.style.transform='translate('+x+'px,'+y+'px)';this.jx=Math.abs(x)>8?x/m:0;this.jy=Math.abs(y)>8?y/m:0};
+j.addEventListener('pointerdown',e=>{Au.init();id=e.pointerId;j.setPointerCapture(id);mv(e)});j.addEventListener('pointermove',e=>{if(e.pointerId===id)mv(e)});
+const up=e=>{if(e.pointerId===id){id=null;this.jx=this.jy=0;kn.style.transform=''}};j.addEventListener('pointerup',up);j.addEventListener('pointercancel',up);
+$('bE').addEventListener('pointerdown',e=>{e.preventDefault();G.act()});$('pr').addEventListener('pointerdown',e=>{e.preventDefault();G.act()});$('dlg').addEventListener('pointerdown',e=>{e.preventDefault();G.act()});
+$('bm').onclick=()=>G.mapk();$('bh').onclick=()=>G.dica();$('bp').onclick=()=>G.esc()},
+vec(){const k=this.k,K=CFG.keys;let x=(k[K.r]||k.arrowright?1:0)-(k[K.l]||k.arrowleft?1:0)+this.jx,y=(k[K.d]||k.arrowdown?1:0)-(k[K.u]||k.arrowup?1:0)+this.jy;const l=Math.hypot(x,y);if(l>1){x/=l;y/=l}return[x,y]}};
+/* ===== RENDER ===== */
+function person(c,x,y,d,t,mv,K){const s=mv?Math.sin(t*11):0,b=mv?Math.abs(s)*1.6:Math.sin(t*2)*.6;c.save();c.translate(Math.round(x),Math.round(y));
+c.fillStyle='rgba(0,0,0,.4)';c.beginPath();c.ellipse(0,2,8,3.5,0,0,7);c.fill();
+c.fillStyle=K.p;c.fillRect(-5,-8,4,9+s*2);c.fillRect(1,-8,4,9-s*2);c.fillStyle='#0d0d10';c.fillRect(-5,1+s*2,4,2);c.fillRect(1,1-s*2,4,2);
+c.fillStyle=K.c;c.fillRect(-6,-19-b,12,12);c.fillStyle=K.a;c.fillRect(-6,-12-b,12,2);c.fillStyle=K.c;c.fillRect(-9,-18-b+s,3,10);c.fillRect(6,-18-b-s,3,10);
+c.fillStyle=K.s;c.fillRect(-9,-9-b+s,3,3);c.fillRect(6,-9-b-s,3,3);c.beginPath();c.arc(0,-24-b,6,0,7);c.fill();
+c.fillStyle=K.h;c.beginPath();if(d===1)c.arc(0,-24-b,6.3,0,7);else c.arc(0,-25-b,6.3,Math.PI,0);c.fill();
+c.fillStyle='#111';if(d===0){c.fillRect(-3,-24-b,1.6,2);c.fillRect(1.4,-24-b,1.6,2)}else if(d>1)c.fillRect(d===3?2:-3.6,-24-b,1.6,2);if(K.l){c.fillStyle=K.h;c.fillRect(-7,-25-b,2.5,15);c.fillRect(4.5,-25-b,2.5,15);c.fillStyle=K.c;c.fillRect(-7,-8,14,6)}c.restore()}
+function entity(c,x,y,t,a){c.save();c.globalAlpha=a;c.translate(x+(Math.random()<.1?(Math.random()-.5)*6:0),y);const sw=Math.sin(t*2)*1.5;
+c.fillStyle='rgba(0,0,0,.5)';c.beginPath();c.ellipse(0,2,9,3.5,0,0,7);c.fill();c.fillStyle='#06080a';c.beginPath();c.moveTo(-7,0);c.lineTo(-4,-34);c.lineTo(4,-34);c.lineTo(7,0);c.fill();
+c.fillRect(-10+sw,-34,2,30);c.fillRect(8-sw,-34,2,30);c.fillStyle='#c9d4d0';c.beginPath();c.ellipse(0,-40,4.5,6.5,0,0,7);c.fill();c.fillStyle='#4ff';c.fillRect(-2.5,-41,5,1);c.restore()}
+const PK={p:'#2a3340',c:'#9fb8c0',a:'#44ffbb',s:'#e0b99a',h:'#2a1c14'},MK={p:'#202024',c:'#7a3a48',a:'#c9a',s:'#e8c4a8',h:'#d8d8e4',l:1},DU=[];
+for(let i=0;i<60;i++)DU.push({x:Math.random(),y:Math.random(),s:Math.random()*.3+.1});
+function drawObj(o,t){const X=o.x*T,Y=o.y*T,w=o.w*T,h=o.h*T,k=KC[o.k]||['#333'];
+if(o.k==='npc'){person(cx,X+16,Y+T-6,0,t,0,MK);return}
+if(o.k==='doc'){cx.fillStyle='#d8d0b4';cx.fillRect(X+6,Y+9,20,15);cx.fillStyle='#776';for(let i=0;i<4;i++)cx.fillRect(X+9,Y+12+i*3,14,1);return}
+cx.fillStyle=k[0];cx.fillRect(X,Y,w,h);cx.fillStyle='rgba(255,255,255,.09)';cx.fillRect(X,Y,w,3);cx.fillStyle='rgba(0,0,0,.4)';cx.fillRect(X,Y+h-5,w,5);
+if(o.k==='mirror'){cx.fillStyle='#8fb4ba';cx.globalAlpha=.55;cx.fillRect(X+3,Y+3,w-6,h-6);if(S.cycle>=2){cx.globalAlpha=Math.min(.4,S.cycle*.08)*(.6+.4*Math.sin(t*3));cx.fillStyle='#050808';cx.fillRect(X+10,Y+10,6,h-14)}cx.globalAlpha=1;return}
+if(o.k==='elev'){cx.fillStyle='#5a6568';cx.fillRect(X+4,Y+4,w/2-5,h-8);cx.fillRect(X+w/2+1,Y+4,w/2-5,h-8);if(S.flags.power){cx.fillStyle='#8fd';cx.fillRect(X+w/2-3,Y-1,6,3)}return}
+if(k[1]){cx.globalAlpha=clamp(.55+.35*Math.sin(t*7+o.x*3)-(Math.random()<.04?.3:0),.1,1);cx.fillStyle=k[1];
+if(o.k==='mon'){for(let i=0;i<o.w;i++){cx.fillRect(X+i*T+4,Y+5,T-8,T-12);if(S.flags.reveal){cx.globalAlpha=1;cx.fillStyle='#e22';cx.font='8px monospace';cx.fillText('1843',X+i*T+6,Y+T/2);cx.fillStyle=k[1]}else if(Math.random()<.5){cx.fillStyle='#000';cx.fillRect(X+i*T+4,Y+5+Math.random()*14,T-8,2);cx.fillStyle=k[1]}}}
+else if(o.k==='cam'){cx.fillRect(X+8,Y+8,w-16,10)}else cx.fillRect(X+5,Y+6,w-10,Math.min(h-12,14));cx.globalAlpha=1}}
+function draw(){const t=G.gt,fx=CFG.fx;cx.setTransform(1,0,0,1,0,0);cx.fillStyle='#030505';cx.fillRect(0,0,W,H);
+const k=CFG.calm?0:G.shk,ox=-G.cx*Z+(Math.random()-.5)*k*10,oy=-G.cy*Z+(Math.random()-.5)*k*10;cx.setTransform(Z,0,0,Z,ox,oy);
+const x0=Math.max(0,G.cx/T|0),y0=Math.max(0,G.cy/T|0),x1=Math.min(MW-1,(G.cx+W/Z)/T|0),y1=Math.min(MH-1,(G.cy+H/Z)/T|0),g=World.g;
+for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const i=y*MW+x,X=x*T,Y=y*T;
+if(g[i]){cx.fillStyle=ROOMS[World.rc[i]][7];cx.fillRect(X,Y,T,T);const h=(x*73+y*131)%7;cx.fillStyle=h<3?'rgba(255,255,255,.0'+(h+2)+')':'rgba(0,0,0,.0'+h+')';cx.fillRect(X,Y,T,T);cx.strokeStyle='rgba(0,0,0,.28)';cx.strokeRect(X+.5,Y+.5,T-1,T-1)}
+else{const dn=y<MH-1&&g[i+MW];if(dn||(x>0&&g[i-1])||(x<MW-1&&g[i+1])||(y>0&&g[i-MW])){cx.fillStyle='#111b1e';cx.fillRect(X,Y,T,T);if(dn){cx.fillStyle='#1d2c30';cx.fillRect(X,Y+T-12,T,12);cx.fillStyle='#2c4247';cx.fillRect(X,Y+T-12,T,2);cx.fillStyle='#070b0c';cx.fillRect(X,Y+T-2,T,2)}}}}
+for(const d of DOORS)if(!dOpen(d)){const X=d.x*T,Y=d.y*T,w=d.w*T,h=d.h*T;cx.fillStyle='#3b2a2a';cx.fillRect(X,Y,w,h);cx.fillStyle='#6a3a3a';for(let i=0;i<(w>h?w:h);i+=8)w>h?cx.fillRect(X+i,Y,3,h):cx.fillRect(X,Y+i,w,3);cx.fillStyle='#f33';cx.fillRect(X+w/2-2,Y+h/2-2,4,4);if(d.t){cx.font='9px monospace';cx.fillText(Math.ceil(L.t-d.t)+'s',X+w/2-8,Y+h/2+12)}}
+for(const o of OBJ)if(o.x+o.w>=x0&&o.x<=x1&&o.y+o.h>=y0&&o.y<=y1&&(!o.v||o.v()))drawObj(o,t);
+cx.fillStyle='rgba(180,220,210,.28)';for(let i=0,n=fx*60|0;i<n;i++){const d=DU[i];d.y=(d.y+d.s*.01)%1;cx.fillRect(G.cx+d.x*W/Z+Math.sin(t+i)*3,G.cy+d.y*H/Z,1.3,1.3)}
+let pa=0,pp=pres();if(pp){const d=Math.hypot(P.x-pp[0]*T,P.y-pp[1]*T);pa=clamp((320-d)/200,0,1)*(Math.sin(t*3)>-.3?1:.25)}
+if(pp&&pa>.02&&P.y<pp[1]*T+4)entity(cx,pp[0]*T,pp[1]*T,t,pa);person(cx,P.x,P.y+7,P.d,P.t,P.mv,PK);if(pp&&pa>.02&&P.y>=pp[1]*T+4)entity(cx,pp[0]*T,pp[1]*T,t,pa);
+cx.setTransform(1,0,0,1,0,0);
+lx.globalCompositeOperation='source-over';lx.clearRect(0,0,W,H);lx.fillStyle='rgba(2,5,6,'+((G.bk>0?.99:S.flags.ch2?.95:.93)-(G.fl>0&&Math.random()<.4?.3:0))+')';lx.fillRect(0,0,W,H);lx.globalCompositeOperation='destination-out';
+const lg=(x,y,r,a)=>{const q=lx.createRadialGradient(x,y,r*.15,x,y,r);q.addColorStop(0,'rgba(0,0,0,'+a+')');q.addColorStop(1,'rgba(0,0,0,0)');lx.fillStyle=q;lx.fillRect(x-r,y-r,r*2,r*2)};
+lg(P.x*Z+ox,P.y*Z+oy,(150+lvl()*12-(S.flags.ch2?35:0))*Z*(G.bk>0?.25:G.fl>0?.4+Math.random()*.6:1+.03*Math.sin(t*3)),1);
+for(const o of OBJ){const q=KC[o.k];if(q&&q[1]&&o.x+o.w>=x0&&o.x<=x1&&o.y+o.h>=y0&&o.y<=y1&&(!o.v||o.v()))lg((o.x+o.w/2)*T*Z+ox,(o.y+o.h/2)*T*Z+oy,(o.k==='mon'?70:46)*Z,.55)}
+G.pv=pa;if(pp&&pa>.02)lg(pp[0]*T*Z+ox,(pp[1]*T-40)*Z+oy,22*Z,.6);cx.drawImage(lc,0,0);
+cx.globalAlpha=.05*fx;cx.fillStyle='rgb('+['20,255,160','40,140,255','150,60,255','255,40,60'][Math.min(S.cycle-1,3)]+')';cx.fillRect(0,0,W,H);
+cx.globalAlpha=fx;cx.drawImage(vg,0,0);cx.globalAlpha=1;if(G.tn>.05&&vr){cx.globalAlpha=G.tn*Math.max(fx,.4);cx.drawImage(vr,0,0);cx.globalAlpha=1}
+if(fx&&!CFG.calm&&(G.fl>0||pa>.5))for(let i=0;i<2;i++){const sy=Math.random()*H,sh=8+Math.random()*26;cx.drawImage(cv,0,sy,W,sh,(Math.random()-.5)*30,sy,W,sh)}}
+function resize(){W=cv.width=lc.width=innerWidth;H=cv.height=lc.height=innerHeight;Z=clamp(Math.min(W,H)/(T*9),1.1,3);vg=document.createElement('canvas');vg.width=W;vg.height=H;const v=vg.getContext('2d'),q=v.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);q.addColorStop(0,'rgba(0,0,0,0)');q.addColorStop(1,'rgba(0,0,0,.75)');v.fillStyle=q;v.fillRect(0,0,W,H);vr=document.createElement('canvas');vr.width=W;vr.height=H;const r=vr.getContext('2d'),q2=r.createRadialGradient(W/2,H/2,Math.min(W,H)*.2,W/2,H/2,Math.max(W,H)*.7);q2.addColorStop(0,'rgba(120,0,10,0)');q2.addColorStop(1,'rgba(140,0,12,.9)');r.fillStyle=q2;r.fillRect(0,0,W,H);G.snap()}
+/* ===== CENAS DOS FINAIS (pixel art) ===== */
+const px=(c,col,x,y,w,h)=>{c.fillStyle=col;c.fillRect(x|0,y|0,w,h)},sp=(c,f,x,y,k)=>{c.save();c.translate(x,y);c.scale(k,k);f();c.restore()};
+const bg=(c,k)=>px(c,k,0,0,160,90),K6={p:'#2a3340',c:'#c9d4d0',a:'#66ffff',s:'#e0b99a',h:'#2a1c14'};
+const mon=(c,t,op)=>{bg(c,'#050a0d');for(let r=0;r<5;r++)for(let q=0;q<10;q++){const x=8+q*15,y=6+r*16,d=t>(r*10+q)*.1+.4,cl=op?!d:d;px(c,'#12202a',x,y,12,11);px(c,'#1b3a44',x+1,y+1,10,9);px(c,cl?'#0a1418':'#9cf',x+3,y+4,2,cl?1:2);px(c,cl?'#0a1418':'#9cf',x+7,y+4,2,cl?1:2)}};
+const hall=(c,on)=>{bg(c,'#06100f');px(c,'#0f1c1f',0,62,160,28);for(let i=0;i<8;i++){px(c,on?'#bff':'#1a2528',10+i*19,8,12,3);if(on){c.globalAlpha=.1;px(c,'#bff',6+i*19,11,20,52);c.globalAlpha=1}}};
+const SC={A:[
+(c,t)=>{hall(c,t<1);for(let i=0;i<8;i++)if(t<1+i*.7){px(c,'#bff',10+i*19,8,12,3);c.globalAlpha=.1;px(c,'#bff',6+i*19,11,20,52);c.globalAlpha=1}sp(c,()=>person(c,0,0,3,t,t<6,PK),30+Math.min(t,6)*14,80,1.4)},
+(c,t)=>{bg(c,'#020405');sp(c,()=>person(c,0,0,3,t,0,PK),45,82,1.5);sp(c,()=>entity(c,0,0,t,.9),120-Math.min(t,3)*9,84,1.5)},
+(c,t)=>{bg(c,'#04090a');[[35,'#88ffaa'],[80,'#e0b99a'],[125,'#ff6666']].forEach((q,i)=>{c.globalAlpha=clamp(1-(t-1-i*1.2),0,1);px(c,q[1],q[0]-9,34,18,18);px(c,'#04090a',q[0]-6,37,12,12);px(c,q[1],q[0]-1,40,2,6);px(c,q[1],q[0],44,5,2)});c.globalAlpha=1},
+(c,t)=>mon(c,t,0),
+(c,t)=>{hall(c,0);if(((t*6)|0)%5)px(c,'#bff',74,8,12,3);sp(c,()=>person(c,0,0,1,t,0,MK),80,84,1.6)},
+(c,t)=>{bg(c,'#000');if(t<5&&((t*1.6)|0)%2==0)px(c,'#4fd',78,44,3,3)}],
+B:[
+(c,t)=>{bg(c,'#091012');px(c,'#2a3a3d',48,10,64,72);const o=Math.min(t*5,26);px(c,'#101a1c',50,12,30-o,68);px(c,'#101a1c',80+o,12,30-o,68);for(let i=0;i<6;i++)px(c,'#1d2c2f',(50+((i*17+t*30)%60))|0,12,1,68);c.font='9px monospace';c.fillStyle='#8fd';c.fillText(['B2','B1','T'][Math.min(2,(t/1.2)|0)],74,8)},
+(c,t)=>{bg(c,'#050a0b');for(let k=0;k<7;k++){const z=1-k*.15+Math.sin(t*2)*.01,w=110*z,h=74*z;px(c,k%2?'#0e1b1c':'#9fd0c8',80-w/2,48-h/2,w,h)}},
+(c,t)=>{hall(c,1);px(c,'#e8fff4',140,20,14,60);const x=20+Math.min(t*14,90);sp(c,()=>person(c,0,0,3,t,t<6,PK),x,80,1.4);c.globalAlpha=.6;sp(c,()=>entity(c,0,0,t,.6),x+26,80,1.4);c.globalAlpha=1},
+(c,t)=>{bg(c,'#070d0f');px(c,'#2a3338',30,44,30,34);sp(c,()=>person(c,0,0,0,t,0,MK),46,70,1.5);px(c,'#10181a',96,20,48,36);px(c,'#e0b99a',110,26,20,20);px(c,'#111',114,34,3,3);px(c,'#111',123,34,3,3);if(((t*9)|0)%6==0)px(c,'#66ffff',96,(20+((t*40)%36))|0,48,1)},
+(c,t)=>{bg(c,'#070d0f');px(c,'#10181a',20,6,120,50);px(c,'#e0b99a',64,14,32,32);px(c,'#111',72,26,5,4);px(c,'#111',83,26,5,4);if(((t*7)|0)%5==0)px(c,'#66ffff',20,(6+((t*50)%50))|0,120,1);sp(c,()=>person(c,0,0,1,t,0,MK),80,92,2.2)},
+(c,t)=>{bg(c,'#000');c.font='bold 34px monospace';const g=((t*8)|0)%7==0;if(g){c.fillStyle='#0ff';c.fillText('00:60',32,52)}c.fillStyle='#f33';c.fillText('00:60',g?36:34,50);c.font='9px monospace';c.fillStyle='#8a9';c.fillText('LOOP 1844',58,72)}],
+C:[
+(c,t)=>{hall(c,1);sp(c,()=>person(c,0,0,3,t,0,PK),62,80,1.5);sp(c,()=>person(c,0,0,2,t,0,MK),96,80,1.5);px(c,'#dddddd',84,52,6,8)},
+(c,t)=>{bg(c,'#1a1410');px(c,'#e8dcc0',40,12,80,66);px(c,'#6a8a8a',46,18,68,48);sp(c,()=>person(c,0,0,0,t,0,PK),68,60,.9);sp(c,()=>person(c,0,0,0,t,0,MK),92,60,.9)},
+(c,t)=>mon(c,t,1),
+(c,t)=>{bg(c,'#04090a');sp(c,()=>entity(c,0,0,t,clamp(1-t/2.5,0,1)),80,84,1.5);c.globalAlpha=clamp(t/2.5,0,1);sp(c,()=>person(c,0,0,0,t,0,K6),80,84,1.5);c.globalAlpha=1},
+(c,t)=>{hall(c,1);[PK,MK,K6].forEach((K,i)=>sp(c,()=>person(c,0,0,3,t,1,K),Math.min(20+t*10,60)+i*24,80,1.4))},
+(c,t)=>{bg(c,'#060c0e');const z=20+Math.min(t,5)*16;px(c,'#e8fff4',80-z/2,50-z*.6,z,z*1.2)},
+(c,t)=>{['#0a1230','#14224a','#2a3a6a','#6a4a7a','#c0607a','#e08a5a','#f0b060','#f8d890','#fff0b0'].forEach((q,i)=>px(c,q,0,i*7,160,8));c.fillStyle='#fff6c0';c.beginPath();c.arc(80,Math.max(34,70-t*6),12,0,7);c.fill();px(c,'#06100c',0,62,160,28);[PK,MK,K6].forEach((K,i)=>sp(c,()=>person(c,0,0,1,t,0,K),60+i*20,86,1.3));c.font='9px monospace';c.fillStyle='#fff';c.fillText('00:61',62,12)}]};
+SC.I=[
+(c,t)=>{bg(c,'#050912');for(let i=0;i<30;i++)px(c,(i%5<1&&((t*2+i)|0)%3==0)?'#ffffff':'#8a9ab8',(i*53)%160,(i*29)%40,1,1);c.fillStyle='#d8dcc0';c.beginPath();c.arc(130,16,8,0,7);c.fill();c.fillStyle='#050912';c.beginPath();c.arc(133,14,7,0,7);c.fill();
+px(c,'#0b1016',20,38,120,52);px(c,'#10181f',20,38,120,4);for(let r=0;r<3;r++)for(let q=0;q<8;q++){const on=(q*7+r*3)%5===0&&((t*3+q+r)|0)%7!==0;px(c,on?'#c9e8b0':'#141c24',28+q*14,48+r*12,8,6)}px(c,'#1b2a2c',72,74,16,16);px(c,'#c9e8b0',74,76,5,14);c.font='bold 9px monospace';c.fillStyle=((t*5)|0)%11===0?'#334':'#99ffdd';c.fillText('INSTITUTO ASTER',37,34)},
+(c,t)=>{hall(c,((t*7)|0)%9!==0);px(c,'#0a1214',70,36,20,26);px(c,'#1c2c2f',72,38,16,24);px(c,'#2a3a3d',84,50,2,2)},
+(c,t)=>{bg(c,'#0a1214');c.strokeStyle='#cfc9b4';c.lineWidth=3;c.beginPath();c.arc(80,34,24,0,7);c.stroke();c.strokeStyle='#e8e2d0';c.lineWidth=2;c.beginPath();c.moveTo(80,34);c.lineTo(80,16);c.moveTo(80,34);c.lineTo(80,34);c.stroke();c.fillStyle='#e8e2d0';c.fillRect(78,32,4,4);c.font='bold 18px monospace';c.fillStyle=((t*9)|0)%13===0?'#802020':'#ff4444';c.fillText('00:60',56,82)},
+(c,t)=>{bg(c,'#0d1618');px(c,'#16282a',0,58,160,32);for(let i=0;i<10;i++)px(c,'#1d3235',i*17,58,1,32);sp(c,()=>{c.rotate(1.57);person(c,0,0,0,t,0,PK)},100,76,1.7);c.globalAlpha=clamp(1-t/2.5,0,1)*.92;px(c,'#000',0,0,160,90);c.globalAlpha=1},
+(c,t)=>{bg(c,'#070d0f');px(c,'#d8d4c4',40,18,80,54);px(c,'#b0ac9c',40,18,80,8);px(c,'#2a3338',48,32,22,26);c.fillStyle='#8a9aa0';c.beginPath();c.arc(59,41,5,0,7);c.fill();px(c,'#8a9aa0',52,48,14,9);c.font='bold 9px monospace';c.fillStyle='#14201e';c.fillText('ASTER-07',72,42);c.font='6px monospace';c.fillText('INSTITUTO',72,51);px(c,((t*2)|0)%2?'#c02030':'#802030',72,57,30,2);px(c,'#555',76,12,8,8)}];
+function drawFin(){const f=G.fc,c=$('fc').getContext('2d'),t=G.gt-f.ts;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.imageSmoothingEnabled=false;SC[f.k][f.i](c,t);c.globalAlpha=clamp(1-t/.9,0,1);c.fillStyle='#000';c.fillRect(0,0,160,90);c.globalAlpha=1}
+/* ===== INÍCIO ===== */
+let last=0,fn=0,fo=0;function frame(ts){requestAnimationFrame(frame);if(ts-last<1000/CFG.fps-2)return;const dt=Math.min((ts-last)/1000||0,.05);last=ts;fn++;if(CFG.fc&&ts-fo>500){$('fp').textContent=Math.round(fn*1000/(ts-fo))+' FPS';fn=0;fo=ts}try{G.update(dt)}catch(e){console.error(e)}try{draw()}catch(e){console.error(e)}try{if(G.fc)drawFin()}catch(e){console.error(e)}}
+addEventListener('resize',resize);addEventListener('blur',()=>{if(G.state==='play')UI.pause()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&G.state==='play')UI.pause()});
+document.documentElement.style.setProperty('--u',CFG.ui);resize();In.init();UI.menu();requestAnimationFrame(frame);
+</script></body></html>
